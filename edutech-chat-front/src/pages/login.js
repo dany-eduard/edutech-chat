@@ -25,11 +25,11 @@ export default function Login() {
       body: JSON.stringify({ user, password })
     })
     const data = await res.json()
-    if (data.token) {
-      setSessionData(data)
-      router.push('/')
-    }
-    setMessage(data.message)
+    const { accessToken, message } = data
+    if (accessToken) {
+      sessionStorage.setItem('token', accessToken)
+      await router.push('/')
+    } else setMessage(message)
   }
 
   return (

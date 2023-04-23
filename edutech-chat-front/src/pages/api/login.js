@@ -1,16 +1,16 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method === 'POST') {
-    res.status(200).json({
-      id: 32,
-      name: 'John',
-      lastname: 'Doe',
-      user: 'student01',
-      userType: 'student',
-      token:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-      message: 'ok'
+    const response = await fetch(`${process.env.API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body)
     })
+
+    const data = await response.json()
+    console.log("🚀 ~ file: login.js:10 ~ handler ~ data:", data)
+    if (response.status !== 200) {
+      return res.status(201).json({ message: data.message })
+    }
+    return res.status(200).json({ accessToken: data.accessToken, message: 'ok' })
   }
 }
