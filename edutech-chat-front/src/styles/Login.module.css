@@ -1,0 +1,22 @@
+.form-longin {
+  width: 100%;
+  max-width: 330px;
+  padding: 15px;
+  margin: auto;
+}
+
+.form-longin .checkbox {
+  font-weight: 400;
+}
+
+.form-longin .form-floating:focus-within {
+  z-index: 2;
+}
+
+.form-longin input[type='email'] {
+  margin-bottom: -1px;
+}
+
+.form-longin input[type='password'] {
+  margin-bottom: 10px;
+}
