@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 import User from '../models/user.js'
 
-async function createUser({ userName, password, name, lastname }) {
+async function createUser({ userName, password, name, lastname, typeId }) {
   const saltRounds = 10
   const hashedPassword = await bcrypt.hash(password, saltRounds)
 
@@ -9,7 +9,8 @@ async function createUser({ userName, password, name, lastname }) {
     userName,
     password: hashedPassword,
     name,
-    lastname
+    lastname,
+    typeId
   })
 
   return user

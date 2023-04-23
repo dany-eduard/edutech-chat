@@ -5,7 +5,8 @@ const registerSchema = Joi.object({
   name: Joi.string().required(),
   lastname: Joi.string().required(),
   user: Joi.string().required(),
-  password: Joi.string().min(8).pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required()
+  password: Joi.string().min(8).pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+  typeId: Joi.number().required()
 })
 
 const responseSchema = Joi.object({
@@ -26,8 +27,8 @@ async function register(req, res) {
         .json({ message: 'validation error', details: formatter.format(errorMessages) })
     }
 
-    const { user: userName, password, name, lastname } = req.body
-    let user = await createUser({ userName, password, name, lastname })
+    const { user: userName, password, name, lastname, typeId } = req.body
+    let user = await createUser({ userName, password, name, lastname, typeId })
     const { value } = responseSchema.validate(user.toJSON(), { stripUnknown: true })
 
     return res.status(201).json({ message: 'Now you can login', data: value })

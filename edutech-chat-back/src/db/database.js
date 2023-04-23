@@ -9,4 +9,11 @@ const database = new Sequelize(databaseName, username, password, {
   dialect: 'postgres'
 })
 
+try {
+  await database.authenticate()
+  console.log('Connection has been established successfully.')
+} catch (error) {
+  console.error('Unable to connect to the database:', error)
+}
+
 export default database
