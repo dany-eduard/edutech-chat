@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { findUserByEmail } from '../services/userService.js'
+import { findUserByUserName } from '../services/userService.js'
 import { jwtSecret } from '../configs/config.js'
 
 async function login(req, res) {
@@ -11,7 +11,7 @@ async function login(req, res) {
       return res.status(401).json({ message: 'Invalid email or password' })
     }
 
-    const user = await findUserByEmail(userName)
+    const user = await findUserByUserName(userName)
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' })
     }

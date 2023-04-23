@@ -16,7 +16,7 @@ async function createUser({ userName, password, name, lastname, typeId }) {
   return user
 }
 
-async function findUserByEmail(userName) {
+async function findUserByUserName(userName) {
   const user = await User.findOne({
     where: { userName }
   })
@@ -24,4 +24,4 @@ async function findUserByEmail(userName) {
   return user
 }
 
-export { createUser, findUserByEmail }
+export { createUser, findUserByUserName }

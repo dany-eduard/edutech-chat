@@ -7,7 +7,6 @@ export default async function handler(req, res) {
     })
 
     const data = await response.json()
-    console.log("🚀 ~ file: login.js:10 ~ handler ~ data:", data)
     if (response.status !== 200) {
       return res.status(201).json({ message: data.message })
     }
