@@ -1,7 +1,9 @@
 import app from './src/app.js'
+import { PORT } from './src/configs/config.js'
 
-const server = app.listen(app.get('port'), () => {
-  console.log('Server is running at http://localhost:%d in %s mode', app.get('port'), app.get('env'))
+const port = PORT ?? 3000
+const server = app.listen(port, () => {
+  console.log('Server is running at http://localhost:%d', `${port}`)
 })
 
 export default server

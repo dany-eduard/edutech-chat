@@ -22,7 +22,7 @@ async function login(req, res) {
     }
 
     const accessToken = jwt.sign(
-      { id: user.id, name: `${user.name + user.lastname}`, user: user.userName },
+      { id: user.id, name: `${user.name} ${user.lastname}`, user: user.userName },
       jwtSecret,
       { expiresIn: '24h' }
     )

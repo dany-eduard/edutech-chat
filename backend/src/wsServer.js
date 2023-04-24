@@ -2,47 +2,64 @@ import http from 'http'
 import jwt from 'jsonwebtoken'
 import { Server } from 'socket.io'
 import { jwtSecret } from './configs/config.js'
-import { findUserByUserName } from './services/userService.js'
+import { findUserById } from './services/userService.js'
 
-const setUpWebSocketServer = ({ app }) => {
+const decodeToken = (token) => {
+  return jwt.verify(`${token}`, jwtSecret)
+}
+
+function setUpWebSocketServer(app) {
   const server = http.createServer(app)
-  const io = new Server(server, { cors: { origin: '**' } })
+  const io = new Server(server, {
+    cors: {
+      origin: '*',
+      methods: ['GET', 'POST']
+      /* , credentials: true */
+    }
+  })
 
   io.use((socket, next) => {
-    const token = socket.handshake.query.token
     try {
-      const decoded = jwt.verify(`${token}`, jwtSecret)
+      const token = socket.handshake.query.token
+      const decoded = decodeToken(`${token}`)
       socket.userId = decoded.id
       next()
     } catch (error) {
-      console.log(error)
-      socket.disconnect()
+      console.error(error)
     }
   })
 
   io.on('connection', (socket) => {
-    console.log('Usuario conectado:', socket.userId)
+    console.log('logged in user:', socket.userId)
 
-    socket.on('message', async ({ recipient, content }) => {
+    socket.on('message', async (socket) => {
       try {
-        const recipientUser = await findUserByUserName(recipient)
+        const { token, message } = socket
+        const decoded = decodeToken(`${token}`)
+
+        const recipientUser = await findUserById(decoded.id)
         if (!recipientUser) throw new Error('user not found')
-        io.to(recipientUser._id.toString()).emit('message', { sender: socket.userId, content })
+
+        const data = {
+          userName: decoded.user,
+          userType: recipientUser.UserType.typeName,
+          message: message,
+          createdAt: new Date()
+        }
+
+        io.emit('message', data)
       } catch (error) {
-        console.log(error)
+        console.error(error)
         socket.emit('error', { message: 'Could not send message' })
       }
     })
 
     socket.on('disconnect', () => {
-      console.log('Logged out user:', socket.userId)
+      console.log('logged out user:', socket.userId)
     })
   })
 
-  app.use((err, req, res, next) => {
-    console.log(err)
-    res.status(500).json({ message: 'Internal Server Error' })
-  })
+  return server
 }
 
-export default setUpWebSocketServer
+export { setUpWebSocketServer }

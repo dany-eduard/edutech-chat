@@ -3,14 +3,13 @@ import compression from 'compression'
 import helmet from 'helmet'
 import cors from 'cors'
 import database from './db/database.js'
-import setUpWebSocketServer from './wsServer.js'
+import { setUpWebSocketServer } from './wsServer.js'
 import { PORT } from './configs/config.js'
 import { router } from './routes/index.js'
 
 const app = express()
 
 app.set('port', PORT ?? 3000)
-
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -27,6 +26,6 @@ app.use('/api', router)
   console.log('Database connected and synced')
 })()
 
-setUpWebSocketServer({ app })
+const server = setUpWebSocketServer(app)
 
-export default app
+export default server
