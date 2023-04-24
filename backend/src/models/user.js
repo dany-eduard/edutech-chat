@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize'
 import database from '../db/database.js'
 import UserTypes from './userTypes.js'
+import Message from './messages.js'
 
 const User = database.define('User', {
   id: {
@@ -26,12 +27,12 @@ const User = database.define('User', {
     allowNull: false
   },
   typeId: {
-    type: DataTypes.NUMBER
+    type: DataTypes.INTEGER
   }
 })
 
-User.belongsTo(UserTypes, {
-  foreignKey: 'typeId'
-})
+User.belongsTo(UserTypes, { foreignKey: 'typeId' })
+Message.belongsTo(User, { foreignKey: 'userId' })
+User.hasMany(Message, { foreignKey: 'userId' })
 
 export default User

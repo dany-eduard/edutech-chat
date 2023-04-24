@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import { Server } from 'socket.io'
 import { jwtSecret } from './configs/config.js'
 import { findUserById } from './services/userService.js'
+import { getAllMessages, saveMessage } from './services/messageService.js'
 
 const decodeToken = (token) => {
   return jwt.verify(`${token}`, jwtSecret)
@@ -29,8 +30,11 @@ function setUpWebSocketServer(app) {
     }
   })
 
-  io.on('connection', (socket) => {
+  io.on('connection', async (socket) => {
     console.log('logged in user:', socket.userId)
+
+    const messages = await getAllMessages()
+    socket.emit('message', messages)
 
     socket.on('message', async (socket) => {
       try {
@@ -46,6 +50,8 @@ function setUpWebSocketServer(app) {
           message: message,
           createdAt: new Date()
         }
+
+        saveMessage({ message, userId: decoded.id })
 
         io.emit('message', data)
       } catch (error) {
