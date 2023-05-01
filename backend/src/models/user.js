@@ -31,8 +31,8 @@ const User = database.define('User', {
   }
 })
 
-User.belongsTo(UserTypes, { foreignKey: 'typeId' })
-Message.belongsTo(User, { foreignKey: 'userId' })
-User.hasMany(Message, { foreignKey: 'userId' })
+User.belongsTo(UserTypes, { foreignKey: 'typeId', as: 'userTypes' })
+Message.belongsTo(User, { foreignKey: 'userId', as: 'user' })
+User.hasMany(Message, { foreignKey: 'userId', as: 'messages' })
 
 export default User

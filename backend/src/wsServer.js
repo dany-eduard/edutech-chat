@@ -22,7 +22,7 @@ function setUpWebSocketServer(app) {
   io.use((socket, next) => {
     try {
       const token = socket.handshake.query.token
-      const decoded = decodeToken(`${token}`)
+      const decoded = decodeToken(`${token}`) 
       socket.userId = decoded.id
       next()
     } catch (error) {
@@ -45,15 +45,18 @@ function setUpWebSocketServer(app) {
         if (!recipientUser) throw new Error('user not found')
 
         const data = {
-          userName: decoded.user,
-          userType: recipientUser.UserType.typeName,
+          user: {
+            userName: decoded.user,
+            userTypes: recipientUser.userTypes,
+            typeId: decoded.id
+          },
           message: message,
           createdAt: new Date()
         }
 
         saveMessage({ message, userId: decoded.id })
 
-        io.emit('message', data)
+        io.emit('message', [data])
       } catch (error) {
         console.error(error)
         socket.emit('error', { message: 'Could not send message' })

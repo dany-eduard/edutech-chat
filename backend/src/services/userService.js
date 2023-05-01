@@ -27,7 +27,13 @@ async function findUserByUserName(userName) {
 async function findUserById(id) {
   const user = await User.findOne({
     where: { id },
-    include: UserTypes
+    include: [
+      {
+        model: UserTypes,
+        as: 'userTypes',
+        attributes: ['typeName']
+      }
+    ]
   })
 
   return user
