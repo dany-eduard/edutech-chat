@@ -5,41 +5,39 @@ import { useEffect, useRef, useState } from 'react'
 
 export default function Home() {
   const router = useRouter()
+  const [token, setToken] = useState('')
   const [message, setMessage] = useState('')
-  const [socket, setSocket] = useState(null)
-  const [token, setToken] = useState(null)
   const [chat, setChat] = useState([])
 
   const chatRef = useRef(null)
+  const socketRef = useRef({ emit: () => {} })
 
   useEffect(() => {
-    const token = sessionStorage.getItem('token')
-    if (!token) {
+    const storedToken = sessionStorage.getItem('token')
+    if (!storedToken) {
       router.push('/login')
     }
 
-    if (token) {
-      const socket = io(process.env.NEXT_PUBLIC_WS_URL, { query: { token } })
-      setSocket(socket)
-      setToken(token)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (socket) {
-      socket.on('message', (message) => {
-        setChat([...chat, message])
+    if (storedToken) {
+      setToken(storedToken)
+      const newSocket = io(process.env.NEXT_PUBLIC_WS_URL, { query: { token: storedToken } })
+      socketRef.current = newSocket
+      newSocket.on('message', (message) => {
+        setChat((chat) => [...chat].concat(message))
       })
     }
-    if (chatRef.current) {
-      chatRef.current.scrollTop = chatRef.current.scrollHeight
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect()
+      }
     }
-  }, [message, chat])
+  }, [])
 
   const handleSendMessage = (e) => {
     e.preventDefault()
     const event = { token, message }
-    socket.emit('message', event)
+    socketRef.current.emit('message', event)
     setMessage('')
   }
 
@@ -72,25 +70,7 @@ export default function Home() {
                   <h5 className='card-title mb-0'>Chat</h5>
                 </div>
                 <div className='card-body'>
-                  <div
-                    className='overflow-auto d-flex flex-column flex-grow-1'
-                    style={{ maxHeight: 'calc(88vh - 210px)', minHeight: 'calc(88vh - 210px)', marginBottom: 'auto' }}
-                    ref={chatRef}>
-                    {chat.map((message, index) => (
-                      <div key={index} className='mb-2'>
-                        <h6
-                          className={`mb-1 small text-${
-                            message.userType === 'moderator' ? 'warning' : 'primary'
-                          }`}>
-                          {`${message.userName}`}
-                          {message.userType === 'moderator' && (
-                            <small className='text-muted'> moderador</small>
-                          )}
-                        </h6>
-                        <p className='mb-0 mt-1'>{message.message}</p>
-                      </div>
-                    ))}
-                  </div>
+                  {chat && <Chat msgRef={chatRef} messages={chat} />}
                   <div className='bd-highlight align-items-end'>
                     <form onSubmit={handleSendMessage}>
                       <div className='form-floating mb-3'>
@@ -121,5 +101,39 @@ export default function Home() {
         </div>
       </main>
     </>
+  )
+}
+
+function Chat({ msgRef, messages }) {
+  const [msgs, setMsgs] = useState(null)
+
+  useEffect(() => {
+    setMsgs((msgs) => messages)
+
+    return () => {
+      setMsgs(null)
+    }
+  }, [messages])
+
+  return (
+    <div
+      className='overflow-auto d-flex flex-column flex-grow-1'
+      style={{
+        maxHeight: 'calc(88vh - 210px)',
+        minHeight: 'calc(88vh - 210px)',
+        marginBottom: 'auto'
+      }}
+      ref={msgRef}>
+      {msgs &&
+        msgs.map((msg, index) => (
+          <div key={index} className='mb-2'>
+            <h6 className={`mb-1 small text-${msg.user.typeId === 1 ? 'warning' : 'primary'}`}>
+              {`${msg.user.userName}`}
+              {msg.typeId === 1 && <small className='text-muted'> moderador</small>}
+            </h6>
+            <p className='mb-0 mt-1'>{msg.message}</p>
+          </div>
+        ))}
+    </div>
   )
 }
