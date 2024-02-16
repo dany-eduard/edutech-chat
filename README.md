@@ -1,13 +1,16 @@
 # edutech-chat: Ejercicio práctico
 
-**Contexto:** El equipo académico de Kuepa ofrece streaming de sus clases virtuales en el
+## Contexto
+El equipo académico de una empresa educativa ofrece streaming de sus clases virtuales en el
 LMS de la organización, que están disponibles solo para estudiantes. En estos streaming
 los estudiantes pueden visualizar un video mientras el docente dicta la clase.
 
-**Objetivo:** Como equipo académico se quiere brindar una herramienta de chat a las clases
+## Objetivo
+Como equipo académico se quiere brindar una herramienta de chat a las clases
 virtuales que permita la interacción entre los participantes y el moderador de la clase.
 
-**Criterios de aceptación:**
+## Criterios de aceptación
+
 - [x] Un estudiante debe poder interactuar con los demás participantes a través de
 mensajes del chat.
 - [x] Los mensajes del chat que ven los participantes deben actualizarse sin requerir la
